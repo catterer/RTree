@@ -364,7 +364,7 @@ protected:
   bool LoadRec(Node* a_node, RTFileStream& a_stream);
   
   Node* m_root;                                    ///< Root of tree
-  ELEMTYPEREAL m_unitSphereVolume;                 ///< Unit sphere constant for required number of dimensions
+  ELEMTYPEREAL m_unitSphereVolume{};                 ///< Unit sphere constant for required number of dimensions
 };
 
 
@@ -453,7 +453,7 @@ RTREE_QUAL::RTree()
   ASSERT(MINNODES > 0);
 
   // Precomputed volumes of the unit spheres for the first few dimensions
-  const float UNIT_SPHERE_VOLUMES[] = {
+  constexpr float UNIT_SPHERE_VOLUMES[] = {
     0.000000f, 2.000000f, 3.141593f, // Dimension  0,1,2
     4.188790f, 4.934802f, 5.263789f, // Dimension  3,4,5
     5.167713f, 4.724766f, 4.058712f, // Dimension  6,7,8
@@ -1054,7 +1054,7 @@ int RTREE_QUAL::PickBranch(const Rect* a_rect, Node* a_node)
   ELEMTYPEREAL bestIncr = (ELEMTYPEREAL)-1;
   ELEMTYPEREAL area;
   ELEMTYPEREAL bestArea;
-  int best;
+  int best{};
   Rect tempRect;
 
   for(int index=0; index < a_node->m_count; ++index)
@@ -1240,7 +1240,7 @@ void RTREE_QUAL::ChoosePartition(PartitionVars* a_parVars, int a_minFill)
   ASSERT(a_parVars);
   
   ELEMTYPEREAL biggestDiff;
-  int group, chosen, betterGroup;
+  int group, chosen{}, betterGroup{};
   
   InitParVars(a_parVars, a_parVars->m_branchCount, a_minFill);
   PickSeeds(a_parVars);
@@ -1354,7 +1354,7 @@ void RTREE_QUAL::InitParVars(PartitionVars* a_parVars, int a_maxRects, int a_min
 RTREE_TEMPLATE
 void RTREE_QUAL::PickSeeds(PartitionVars* a_parVars)
 {
-  int seed0, seed1;
+  int seed0{}, seed1{};
   ELEMTYPEREAL worst, waste;
   ELEMTYPEREAL area[MAXNODES+1];
 
