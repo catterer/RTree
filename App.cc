@@ -11,6 +11,8 @@ using Point = std::shared_ptr<Pdata>;
 using Id = uint32_t;
 using Data = std::map<Id, Point>;
 Data data{};
+Pdata tgt{};
+Pdata crnr{};
 
 Point ParsePoint (std::string &s)
 {
@@ -31,6 +33,7 @@ void ParseData()
 
     std::string l;
     uint32_t c = 0;
+    Point p{};
     while (std::getline(o, l)) {
         Id r;
         c++;
@@ -40,13 +43,16 @@ void ParseData()
             r = stoll(l);
             assert(r);
             break;
-        case 2:
+        case 2: {
             if (!l.length()) {
                 c = 0;
                 break;
             }
-            data.emplace(r, ParsePoint(l));
+            const auto& pr = data.emplace(r, ParsePoint(l));
+            if (pr.second && pr.first->first == 584531489)
+                tgt = *(pr.first->second);
             break;
+        }
         case 3:
             assert(!l.length());
             c = 0;
@@ -55,16 +61,32 @@ void ParseData()
             abort();
     }
     }
+//    assert(tgt[0]);
 }
 
-int main()
+int main(int argc, char** argv)
 {
+    assert(argc >= 2);
+    float delta = stof(std::string{argv[1]});
+
     ParseData();
+
+    crnr = tgt;
+    for (int i = 0; i < CLS_FEATURES; i++)
+        crnr[i] += delta;
+
     std::cout << data.size() << std::endl;
 
     RTree<Id, float, CLS_FEATURES> t{};
     for (const auto& p: data)
         t.Insert(p.second->data(), p.second->data(), p.first);
+
+    for (uint32_t i = 0 ;i < 1000; i++)
+        t.Search(tgt.data(), crnr.data(),
+            [](Id i, void* unused) -> bool {
+    //            std::cout << i << std::endl;
+                return true;
+            }, NULL);
     return 0;
 }
 
